@@ -12,7 +12,7 @@ import org.springframework.web.bind.annotation.RestController;
 import java.util.List;
 
 @RestController
-@RequestMapping("/postagem")
+@RequestMapping("/postagens")
 @CrossOrigin(origins = "*", allowedHeaders = "*")
 public class PostagemController {
 
