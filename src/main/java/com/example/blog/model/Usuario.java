@@ -13,7 +13,7 @@ import java.util.List;
 public class Usuario {
 
 
-    @Size(min = 2, max = 5000)@Id
+    @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
