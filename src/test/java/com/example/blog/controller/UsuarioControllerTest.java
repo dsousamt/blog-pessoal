@@ -1,4 +1,4 @@
-package controller;
+package com.example.blog.controller;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
@@ -37,14 +37,15 @@ public class UsuarioControllerTest {
 		usuarioRepository.deleteAll();
 		
 		usuarioService.cadastrarUsuario(new Usuario(0L,
-				"Root", "root@root.com", "rootroot", " "));
+				"Root", "root@root.com", "rootroot", "-"));
 	}
 	
 	@Test
 	@DisplayName("Cadastra usuário")
 	public void deveCriarUsuario() {
-		HttpEntity<Usuario> corpoRequisicao = new HttpEntity<Usuario>( new Usuario(0L,
-				"Matheus Sousa", "matheus@email.com", "123", " "));
+		HttpEntity<Usuario> corpoRequisicao = new HttpEntity<Usuario>( new Usuario(0L, 
+				"Administrador", "admin@email.com.br", "admin123", "https://i.imgur.com/Tk9f19K.png"));
+
 		
 		ResponseEntity<Usuario> corpoResposta = testRestTemplate
 				.exchange("/usuarios/cadastrar", HttpMethod.POST, corpoRequisicao, Usuario.class);
@@ -57,10 +58,10 @@ public class UsuarioControllerTest {
 	@DisplayName("Impede usuário duplicado")
 	public void naoDeveDuplicarUsuario() {
 		usuarioService.cadastrarUsuario(new Usuario(0L,
-				"Matheus Sousa", "matheus@email.com", "123", " "));
+				"Administrador", "admin@email.com.br", "admin123", "https://i.imgur.com/Tk9f19K.png"));
 		
 		HttpEntity<Usuario> corpoRequisicao = new HttpEntity<Usuario>( new Usuario(0L,
-				"Matheus Sousa", "matheus@email.com", "123", " "));
+				"Administrador", "admin", "admin123", "https://i.imgur.com/Tk9f19K.png"));
 		
 		ResponseEntity<Usuario> corpoResposta = testRestTemplate
 				.exchange("/usuarios/cadastrar", HttpMethod.POST, corpoRequisicao, Usuario.class);
@@ -74,14 +75,15 @@ public class UsuarioControllerTest {
 	public void deveAtualizarUsuario () {
 		
 		Optional<Usuario> usuarioCadastrado = usuarioService.cadastrarUsuario(new Usuario(0L,
-				"Matheus", "matheus@email.com", "123", " "));
+				"Administrador1", "admin1@email.com.br", "admin123", "https://i.imgur.com/Tk9f19K.png"));
 		
 		Usuario usuarioUpdate = new Usuario(usuarioCadastrado.get().getId(),
-				"Matheus Sousa", "matheus@email.com", "123", " ");
+				"Administrador2", "admin2@email.com.br", "admin123", "https://i.imgur.com/Tk9f19K.png");
 		
 		HttpEntity<Usuario> corpoRequisicao = new HttpEntity<Usuario>(usuarioUpdate);
 		
 		ResponseEntity<Usuario> corpoResposta = testRestTemplate
+				.withBasicAuth("root@root.com", "rootroot")
 				.exchange("/usuarios/atualizar", HttpMethod.PUT, corpoRequisicao, Usuario.class);
 		
 		assertEquals(HttpStatus.OK, corpoResposta.getStatusCode());
@@ -89,15 +91,16 @@ public class UsuarioControllerTest {
 	
 	
 	@Test
-	@DisplayName("Mostra todos usuários")
+	@DisplayName("Listar todos usuários")
 	public void deveMostrarTodosUsers() {
 		usuarioService.cadastrarUsuario(new Usuario(0L,
-				"Matheus Sousa", "matheus@email.com", "123", " "));
+				"Matheus", "matheus@email.com.br", "12345678", "-"));
 		
 		usuarioService.cadastrarUsuario(new Usuario(0L,
-				"Mariana Sousa", "mariana@email.com", "123", " "));
+				"Mariana", "mariana@email.com.br", "12345678", "-"));
 		
 		ResponseEntity<String> resposta = testRestTemplate
+				.withBasicAuth("root@root.com", "rootroot")
 				.exchange("/usuarios/all", HttpMethod.GET, null, String.class);
 		
 		assertEquals(HttpStatus.OK, resposta.getStatusCode());
